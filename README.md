@@ -50,6 +50,14 @@ All services share DTOs, security primitives, and Mongo document models housed i
 - `app/frontends/roku`: SceneGraph stub for Roku channel integration
 - `app/frontends/admin-cms`: Next.js + Tailwind powered web console
 
+### UI Screens Highlight
+
+- **Mobile Home** – Continue Watching rail, Trending carousel, profile-aware navigation.
+- **Mobile Detail** – Title synopsis page with metadata, play CTA, and plan gating hooks.
+- **TV Rail View** – Remote-friendly rows with focus rings and D-pad navigation stubs.
+- **TV Web Continue Watching** – PWA cards showing progress bars and keyboard/remote focus states.
+- **Admin Dashboard** – Quick links plus catalog overview table with filters and actions ready for extension.
+
 ## Tooling & Scripts
 
 - `scripts/seed_dev_data.sh`: Loads sample catalog data into Mongo & media into MinIO
