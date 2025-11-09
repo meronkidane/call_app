@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="MainScene" extends="Scene">
+  <script type="text/brightscript" uri="pkg:/components/MainScene.brs" />
+  <children>
+    <MarkupGrid id="rowList" itemComponentName="PosterItem" translation="[60,120]" rowItemSize="[320,180]" />
+  </children>
+</component>

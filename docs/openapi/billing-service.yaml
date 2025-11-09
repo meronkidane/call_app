@@ -1,0 +1,183 @@
+openapi: 3.1.0
+info:
+  title: StreamHub Billing Service API
+  version: 0.1.0
+servers:
+  - url: http://localhost:8085
+    description: Local development
+paths:
+  /billing/plans:
+    get:
+      summary: List subscription plans
+      tags: [Plans]
+      responses:
+        '200':
+          description: Available plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Plan'
+  /billing/subscription/start:
+    post:
+      summary: Start or change a subscription
+      tags: [Subscription]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionStartRequest'
+      responses:
+        '200':
+          description: Subscription state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionEnvelope'
+  /billing/subscription/status/{userId}:
+    get:
+      summary: Retrieve active subscription for a user
+      tags: [Subscription]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Subscription status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionEnvelope'
+  /billing/subscription/cancel/{userId}:
+    post:
+      summary: Cancel an active subscription
+      tags: [Subscription]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cancellation acknowledged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyResponse'
+  /billing/webhook:
+    post:
+      summary: Receive provider webhook events
+      tags: [Webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingWebhookRequest'
+      responses:
+        '200':
+          description: Webhook processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyResponse'
+components:
+  schemas:
+    Plan:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        maxDevices:
+          type: integer
+        maxResolution:
+          type: string
+        drmRequired:
+          type: boolean
+    SubscriptionStartRequest:
+      type: object
+      required: [userId, planCode]
+      properties:
+        userId:
+          type: string
+        planCode:
+          type: string
+        paymentToken:
+          type: string
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        planCode:
+          type: string
+        status:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+          nullable: true
+        renewsAt:
+          type: string
+          format: date-time
+          nullable: true
+    SubscriptionEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Subscription'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    BillingWebhookRequest:
+      type: object
+      required: [provider, eventType]
+      properties:
+        provider:
+          type: string
+        eventType:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true
+    Metadata:
+      type: object
+      properties:
+        status:
+          type: string
+        code:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+        traceId:
+          type: string
+          nullable: true
+    EmptyResponse:
+      type: object
+      properties:
+        data:
+          nullable: true
+        metadata:
+          $ref: '#/components/schemas/Metadata'

@@ -1,0 +1,77 @@
+global:
+  imageRegistry: streamhub
+
+services:
+  - name: gateway
+    replicas: 1
+    containerPort: 8080
+    image: streamhub/gateway:latest
+    env:
+      SPRING_PROFILES_ACTIVE: kubernetes
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/streamhub
+      SPRING_REDIS_URL: redis://redis:6379
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  - name: auth-service
+    replicas: 1
+    containerPort: 8081
+    image: streamhub/auth-service:latest
+    env:
+      SPRING_PROFILES_ACTIVE: kubernetes
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/streamhub
+      SPRING_REDIS_URL: redis://redis:6379
+  - name: catalog-service
+    replicas: 1
+    containerPort: 8082
+    image: streamhub/catalog-service:latest
+    env:
+      SPRING_PROFILES_ACTIVE: kubernetes
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/streamhub
+  - name: streaming-service
+    replicas: 1
+    containerPort: 8083
+    image: streamhub/streaming-service:latest
+    env:
+      SPRING_PROFILES_ACTIVE: kubernetes
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/streamhub
+  - name: user-service
+    replicas: 1
+    containerPort: 8084
+    image: streamhub/user-service:latest
+    env:
+      SPRING_PROFILES_ACTIVE: kubernetes
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/streamhub
+  - name: billing-service
+    replicas: 1
+    containerPort: 8085
+    image: streamhub/billing-service:latest
+    env:
+      SPRING_PROFILES_ACTIVE: kubernetes
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/streamhub
+  - name: recommendation-service
+    replicas: 1
+    containerPort: 8086
+    image: streamhub/recommendation-service:latest
+    env:
+      SPRING_PROFILES_ACTIVE: kubernetes
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/streamhub
+  - name: analytics-service
+    replicas: 1
+    containerPort: 8087
+    image: streamhub/analytics-service:latest
+    env:
+      SPRING_PROFILES_ACTIVE: kubernetes
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/streamhub
+  - name: cms-service
+    replicas: 1
+    containerPort: 8088
+    image: streamhub/cms-service:latest
+    env:
+      SPRING_PROFILES_ACTIVE: kubernetes
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/streamhub
+  - name: notification-service
+    replicas: 1
+    containerPort: 8089
+    image: streamhub/notification-service:latest
+    env:
+      SPRING_PROFILES_ACTIVE: kubernetes
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/streamhub

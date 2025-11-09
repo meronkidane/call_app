@@ -1,0 +1,99 @@
+openapi: 3.1.0
+info:
+  title: StreamHub Recommendation Service API
+  version: 0.1.0
+servers:
+  - url: http://localhost:8086
+    description: Local development
+paths:
+  /recs/home/{profileId}:
+    get:
+      summary: Fetch personalized home recommendations
+      tags: [Recommendations]
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Recommendation list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationEnvelope'
+  /recs/because/{profileId}/{contentId}:
+    get:
+      summary: Get similar titles because user watched a given content
+      tags: [Recommendations]
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: contentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Related titles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationEnvelope'
+  /recs/continue/{profileId}:
+    get:
+      summary: Continue watching list for profile
+      tags: [Recommendations]
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Continue watching items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationEnvelope'
+components:
+  schemas:
+    RecommendationEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/RecommendationResponse'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    RecommendationResponse:
+      type: object
+      properties:
+        profileId:
+          type: string
+        items:
+          type: array
+          items:
+            type: string
+    Metadata:
+      type: object
+      properties:
+        status:
+          type: string
+        code:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+        traceId:
+          type: string
+          nullable: true

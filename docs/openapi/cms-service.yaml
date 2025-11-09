@@ -1,0 +1,251 @@
+openapi: 3.1.0
+info:
+  title: StreamHub CMS Service API
+  version: 0.1.0
+servers:
+  - url: http://localhost:8088
+    description: Local development
+paths:
+  /cms/title:
+    post:
+      summary: Create or update a title entity
+      tags: [Titles]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TitleUpsertRequest'
+      responses:
+        '200':
+          description: Title upserted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TitleEnvelope'
+  /cms/episode:
+    post:
+      summary: Create or update an episode
+      tags: [Episodes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpisodeUpsertRequest'
+      responses:
+        '200':
+          description: Episode upserted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpisodeEnvelope'
+  /cms/asset:
+    post:
+      summary: Create or update an asset mapping
+      tags: [Assets]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetUpsertRequest'
+      responses:
+        '200':
+          description: Asset upserted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetEnvelope'
+  /cms/transcode:
+    post:
+      summary: Trigger a transcode workflow
+      tags: [Transcode]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TranscodeTriggerRequest'
+      responses:
+        '200':
+          description: Transcode requested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyResponse'
+  /cms/schedule:
+    post:
+      summary: Schedule title availability
+      tags: [Scheduling]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleRequest'
+      responses:
+        '200':
+          description: Schedule registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyResponse'
+components:
+  schemas:
+    TitleUpsertRequest:
+      type: object
+      required: [type, name, year, genres]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        synopsis:
+          type: string
+        year:
+          type: integer
+        genres:
+          type: array
+          items:
+            type: string
+        cast:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          items:
+            type: string
+        rating:
+          type: number
+        artwork:
+          type: string
+        availabilityRegions:
+          type: array
+          items:
+            type: string
+        premium:
+          type: boolean
+    EpisodeUpsertRequest:
+      type: object
+      required: [titleId, season, number, name, durationSec]
+      properties:
+        id:
+          type: string
+        titleId:
+          type: string
+        season:
+          type: integer
+        number:
+          type: integer
+        name:
+          type: string
+        synopsis:
+          type: string
+        durationSec:
+          type: integer
+          format: int64
+    AssetUpsertRequest:
+      type: object
+      required: [parentId, codecs]
+      properties:
+        id:
+          type: string
+        parentId:
+          type: string
+        codecs:
+          type: array
+          items:
+            type: string
+        renditions:
+          type: array
+          items:
+            type: string
+        drm:
+          type: string
+        hlsUrl:
+          type: string
+          format: uri
+        dashUrl:
+          type: string
+          format: uri
+        captions:
+          type: array
+          items:
+            type: string
+        posters:
+          type: array
+          items:
+            type: string
+    TranscodeTriggerRequest:
+      type: object
+      required: [sourcePath, outputProfile]
+      properties:
+        sourcePath:
+          type: string
+        outputProfile:
+          type: string
+    ScheduleRequest:
+      type: object
+      required: [titleId, startAt, endAt]
+      properties:
+        titleId:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        regions:
+          type: array
+          items:
+            type: string
+    TitleEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TitleUpsertRequest'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    EpisodeEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EpisodeUpsertRequest'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    AssetEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AssetUpsertRequest'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    Metadata:
+      type: object
+      properties:
+        status:
+          type: string
+        code:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+        traceId:
+          type: string
+          nullable: true
+    EmptyResponse:
+      type: object
+      properties:
+        data:
+          nullable: true
+        metadata:
+          $ref: '#/components/schemas/Metadata'

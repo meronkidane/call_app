@@ -1,0 +1,21 @@
+server:
+  port: 8089
+  shutdown: graceful
+spring:
+  application:
+    name: notification-service
+  data:
+    mongodb:
+      database: streamhub
+      auto-index-creation: true
+security:
+  mock-auth:
+    enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always

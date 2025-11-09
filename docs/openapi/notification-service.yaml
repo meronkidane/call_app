@@ -1,0 +1,65 @@
+openapi: 3.1.0
+info:
+  title: StreamHub Notification Service API
+  version: 0.1.0
+servers:
+  - url: http://localhost:8089
+    description: Local development
+paths:
+  /notifications:
+    post:
+      summary: Send a notification through configured channels
+      tags: [Notifications]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationRequest'
+      responses:
+        '200':
+          description: Notification accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyResponse'
+components:
+  schemas:
+    NotificationRequest:
+      type: object
+      required: [channel, recipient, template]
+      properties:
+        channel:
+          type: string
+          enum: [email, push, sms]
+        recipient:
+          type: string
+        template:
+          type: string
+        variables:
+          type: object
+          additionalProperties: true
+    Metadata:
+      type: object
+      properties:
+        status:
+          type: string
+        code:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+        traceId:
+          type: string
+          nullable: true
+    EmptyResponse:
+      type: object
+      properties:
+        data:
+          nullable: true
+        metadata:
+          $ref: '#/components/schemas/Metadata'

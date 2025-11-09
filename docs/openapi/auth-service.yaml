@@ -1,0 +1,223 @@
+openapi: 3.1.0
+info:
+  title: StreamHub Auth Service API
+  version: 0.1.0
+servers:
+  - url: http://localhost:8081
+    description: Local development
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user account and issue tokens
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Registration succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenEnvelope'
+  /auth/login:
+    post:
+      summary: Authenticate an existing user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenEnvelope'
+  /auth/refresh:
+    post:
+      summary: Exchange a refresh token for a new access token
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Refreshed token pair
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenEnvelope'
+  /auth/logout:
+    post:
+      summary: Revoke a refresh token and end a session
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+      responses:
+        '200':
+          description: Logout acknowledged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyResponse'
+  /auth/devices/{userId}:
+    get:
+      summary: List all active devices for a user
+      tags: [Devices]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Active device sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceSession'
+  /auth/password/reset:
+    post:
+      summary: Request a password reset flow
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+      responses:
+        '200':
+          description: Reset email dispatched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyResponse'
+components:
+  schemas:
+    TokenEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TokenResponse'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    EmptyResponse:
+      type: object
+      properties:
+        data:
+          nullable: true
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    Metadata:
+      type: object
+      properties:
+        status:
+          type: string
+        code:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+        traceId:
+          type: string
+          nullable: true
+    RegisterRequest:
+      type: object
+      required: [email, phone, password, deviceId, deviceType]
+      properties:
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        password:
+          type: string
+          format: password
+        deviceId:
+          type: string
+        deviceType:
+          type: string
+    LoginRequest:
+      type: object
+      required: [email, password, deviceId, deviceType]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        deviceId:
+          type: string
+        deviceType:
+          type: string
+    RefreshRequest:
+      type: object
+      required: [refreshToken, deviceId]
+      properties:
+        refreshToken:
+          type: string
+        deviceId:
+          type: string
+    LogoutRequest:
+      type: object
+      required: [refreshToken, deviceId]
+      properties:
+        refreshToken:
+          type: string
+        deviceId:
+          type: string
+    PasswordResetRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+    TokenResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        expiresIn:
+          type: integer
+          format: int64
+        refreshToken:
+          type: string
+        refreshExpiresIn:
+          type: integer
+          format: int64
+    DeviceSession:
+      type: object
+      properties:
+        deviceId:
+          type: string
+        deviceType:
+          type: string
+        lastSeen:
+          type: string
+          format: date-time
+        status:
+          type: string

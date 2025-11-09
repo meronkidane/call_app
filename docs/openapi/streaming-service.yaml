@@ -1,0 +1,86 @@
+openapi: 3.1.0
+info:
+  title: StreamHub Streaming Service API
+  version: 0.1.0
+servers:
+  - url: http://localhost:8083
+    description: Local development
+paths:
+  /play/start:
+    post:
+      summary: Start playback for a given content item
+      tags: [Playback]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaybackStartRequest'
+      responses:
+        '200':
+          description: Playback session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaybackStartEnvelope'
+components:
+  schemas:
+    PlaybackStartRequest:
+      type: object
+      required: [contentId, deviceId]
+      properties:
+        contentId:
+          type: string
+        deviceId:
+          type: string
+        profileId:
+          type: string
+        planCode:
+          type: string
+        drmType:
+          type: string
+    PlaybackStartResponse:
+      type: object
+      properties:
+        playbackToken:
+          type: string
+        hlsUrl:
+          type: string
+          format: uri
+        dashUrl:
+          type: string
+          format: uri
+        licenseServerUrl:
+          type: string
+          format: uri
+        drmHeaders:
+          type: object
+          additionalProperties:
+            type: string
+        expiresInSeconds:
+          type: integer
+          format: int64
+    PlaybackStartEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PlaybackStartResponse'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    Metadata:
+      type: object
+      properties:
+        status:
+          type: string
+        code:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+        traceId:
+          type: string
+          nullable: true

@@ -1,0 +1,32 @@
+{{- range $svc := .Values.services }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "streamhub.fullname" $ }}-{{ $svc.name }}
+  labels:
+    app: {{ include "streamhub.fullname" $ }}-{{ $svc.name }}
+    {{- include "streamhub.labels" $ | nindent 4 }}
+spec:
+  replicas: {{ $svc.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ include "streamhub.fullname" $ }}-{{ $svc.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "streamhub.fullname" $ }}-{{ $svc.name }}
+    spec:
+      containers:
+        - name: {{ $svc.name }}
+          image: {{ $svc.image | default (printf "%s/%s:latest" $.Values.global.imageRegistry $svc.name) }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: {{ $svc.containerPort | default 8080 }}
+          env:
+            {{- range $key, $val := $svc.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+{{- end }}

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: streamhub
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: streamhub-config
+  namespace: streamhub
+data:
+  SPRING_DATA_MONGODB_URI: mongodb://mongo.streamhub.svc.cluster.local:27017/streamhub
+  SPRING_REDIS_URL: redis://redis.streamhub.svc.cluster.local:6379
+  KAFKA_BOOTSTRAP_SERVERS: kafka.streamhub.svc.cluster.local:9092

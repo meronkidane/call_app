@@ -1,0 +1,247 @@
+openapi: 3.1.0
+info:
+  title: StreamHub Catalog Service API
+  version: 0.1.0
+servers:
+  - url: http://localhost:8082
+    description: Local development
+paths:
+  /catalog/search:
+    post:
+      summary: Search titles and episodes
+      tags: [Catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCatalogResponse'
+  /catalog/trending:
+    get:
+      summary: Fetch trending titles
+      tags: [Catalog]
+      responses:
+        '200':
+          description: Trending tiles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogCollection'
+  /catalog/title/{id}:
+    get:
+      summary: Retrieve a title by id
+      tags: [Catalog]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Title detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogEnvelope'
+  /catalog/episode/{id}:
+    get:
+      summary: Retrieve an episode by id
+      tags: [Catalog]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Episode detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpisodeEnvelope'
+  /catalog/genre/{name}:
+    get:
+      summary: Browses titles by genre name
+      tags: [Catalog]
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Titles for genre
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogCollection'
+  /catalog/continue/{profileId}:
+    get:
+      summary: Continue watching entries for profile
+      tags: [Catalog]
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Continue watching rows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContinueWatchingItem'
+components:
+  schemas:
+    SearchRequest:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+        genres:
+          type: array
+          items:
+            type: string
+        page:
+          type: integer
+          minimum: 0
+          default: 0
+        size:
+          type: integer
+          minimum: 1
+          default: 20
+    CatalogItem:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        synopsis:
+          type: string
+        year:
+          type: integer
+        genres:
+          type: array
+          items:
+            type: string
+        cast:
+          type: array
+          items:
+            type: string
+        rating:
+          type: number
+        premium:
+          type: boolean
+        artwork:
+          type: string
+    Episode:
+      type: object
+      properties:
+        id:
+          type: string
+        titleId:
+          type: string
+        season:
+          type: integer
+        number:
+          type: integer
+        name:
+          type: string
+        synopsis:
+          type: string
+        durationSec:
+          type: integer
+          format: int64
+    ContinueWatchingItem:
+      type: object
+      properties:
+        contentId:
+          type: string
+        positionSec:
+          type: integer
+          format: int64
+        durationSec:
+          type: integer
+          format: int64
+        title:
+          type: string
+        artworkUrl:
+          type: string
+    PaginatedCatalogResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PaginatedCatalogItems'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    PaginatedCatalogItems:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogItem'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+        size:
+          type: integer
+    CatalogEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CatalogItem'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    EpisodeEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Episode'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    CatalogCollection:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogItem'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    Metadata:
+      type: object
+      properties:
+        status:
+          type: string
+        code:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+        traceId:
+          type: string
+          nullable: true

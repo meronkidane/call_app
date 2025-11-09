@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="PosterItem" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/PosterItem.brs" />
+  <children>
+    <Rectangle id="bg" width="320" height="180" color="0x1f2937ff" />
+    <Label id="title" horizAlign="center" vertAlign="center" width="320" height="180" color="0xfafafa" />
+  </children>
+</component>

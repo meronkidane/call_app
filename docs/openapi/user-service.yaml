@@ -1,0 +1,317 @@
+openapi: 3.1.0
+info:
+  title: StreamHub User Service API
+  version: 0.1.0
+servers:
+  - url: http://localhost:8084
+    description: Local development
+paths:
+  /profiles/{userId}:
+    get:
+      summary: List profiles for a user account
+      tags: [Profiles]
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profiles for user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Profile'
+  /profiles:
+    post:
+      summary: Create a profile
+      tags: [Profiles]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileRequest'
+      responses:
+        '200':
+          description: Profile created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileEnvelope'
+  /profiles/{profileId}:
+    put:
+      summary: Update a profile
+      tags: [Profiles]
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileRequest'
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileEnvelope'
+    delete:
+      summary: Delete a profile
+      tags: [Profiles]
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profile deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyResponse'
+  /profiles/{profileId}/switch:
+    post:
+      summary: Switch active profile for a device
+      tags: [Profiles]
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwitchProfileRequest'
+      responses:
+        '200':
+          description: Switch acknowledged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyResponse'
+  /watchlist/{profileId}:
+    get:
+      summary: Retrieve watchlist items for a profile
+      tags: [Watchlist]
+      parameters:
+        - in: path
+          name: profileId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Watchlist entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WatchlistItem'
+  /watchlist:
+    post:
+      summary: Add an item to the watchlist
+      tags: [Watchlist]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WatchlistRequest'
+      responses:
+        '200':
+          description: Added to watchlist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyResponse'
+  /watchlist/{profileId}/{contentId}:
+    delete:
+      summary: Remove an item from the watchlist
+      tags: [Watchlist]
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: contentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Removed from watchlist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyResponse'
+  /history/{profileId}:
+    get:
+      summary: Fetch watch history entries for profile
+      tags: [History]
+      parameters:
+        - in: path
+          name: profileId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Watch history items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WatchHistory'
+  /history:
+    post:
+      summary: Record playback progress
+      tags: [History]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WatchHistoryUpdateRequest'
+      responses:
+        '200':
+          description: History updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatchHistoryEnvelope'
+components:
+  schemas:
+    ProfileRequest:
+      type: object
+      required: [userId, name]
+      properties:
+        userId:
+          type: string
+        name:
+          type: string
+        avatar:
+          type: string
+        maturityRating:
+          type: string
+    Profile:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        avatar:
+          type: string
+        maturityRating:
+          type: string
+    ProfileEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Profile'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    SwitchProfileRequest:
+      type: object
+      required: [userId]
+      properties:
+        userId:
+          type: string
+    WatchlistRequest:
+      type: object
+      required: [profileId, contentId]
+      properties:
+        profileId:
+          type: string
+        contentId:
+          type: string
+    WatchlistItem:
+      type: object
+      properties:
+        id:
+          type: string
+        contentId:
+          type: string
+        addedAt:
+          type: string
+          format: date-time
+    WatchHistoryUpdateRequest:
+      type: object
+      required: [profileId, contentId, positionSec]
+      properties:
+        profileId:
+          type: string
+        contentId:
+          type: string
+        positionSec:
+          type: integer
+          format: int64
+        completed:
+          type: boolean
+    WatchHistory:
+      type: object
+      properties:
+        id:
+          type: string
+        contentId:
+          type: string
+        positionSec:
+          type: integer
+          format: int64
+        completed:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+    WatchHistoryEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WatchHistory'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+    Metadata:
+      type: object
+      properties:
+        status:
+          type: string
+        code:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+        traceId:
+          type: string
+          nullable: true
+    EmptyResponse:
+      type: object
+      properties:
+        data:
+          nullable: true
+        metadata:
+          $ref: '#/components/schemas/Metadata'

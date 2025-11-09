@@ -1,0 +1,61 @@
+---
+title: StreamHub Platform Overview
+---
+flowchart LR
+  subgraph Clients
+    Mobile[React Native Mobile]
+    TVRN[React Native TV]
+    TVWeb[TV Web PWA]
+    Roku[Roku Channel]
+    Admin[Next.js Admin CMS]
+  end
+
+  subgraph Edge
+    Gateway[Gateway Service]
+  end
+
+  subgraph Backend
+    Auth[Auth Service]
+    User[User Service]
+    Catalog[Catalog Service]
+    Streaming[Streaming Service]
+    Billing[Billing Service]
+    Recs[Recommendation Service]
+    Analytics[Analytics Service]
+    CMS[CMS Service]
+    Notification[Notification Service]
+  end
+
+  subgraph Data
+    Mongo[(Reactive MongoDB)]
+    Redis[(Redis Cache)]
+    Kafka[(Kafka Topics)]
+    OpenSearch[(OpenSearch)]
+    Minio[(MinIO / Media Storage)]
+  end
+
+  Clients --> Gateway
+  Gateway --> Auth
+  Gateway --> User
+  Gateway --> Catalog
+  Gateway --> Streaming
+  Gateway --> Billing
+  Gateway --> Recs
+  Gateway --> Analytics
+  Gateway --> CMS
+  Gateway --> Notification
+
+  Auth --> Mongo
+  User --> Mongo
+  Catalog --> Mongo
+  Catalog --> OpenSearch
+  Streaming --> Redis
+  Streaming --> Minio
+  Billing --> Mongo
+  Billing --> Kafka
+  Recs --> Mongo
+  Recs --> Redis
+  Analytics --> Kafka
+  Analytics --> Mongo
+  Notification --> Kafka
+  Notification --> Redis
